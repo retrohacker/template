@@ -109,10 +109,10 @@ cat ./app/**/*.css > index.html
 cat ./app/pre-template.html >> index.html
 # Inject all of our HTML into the pa ge
 cat ./app/**/*.html > index.html
-cat ./app/pre-js.html >> index.h tml
+cat ./app/pre-js.html >> index.html
 # Inject all of our JS into the page
 cat ./app/**/*.js >> index.html
-cat ./app/post-js.html >> index.h tml
+cat ./app/post-js.html >> index.html
 ```
 
 Now `index.html` should contain your single page app!
