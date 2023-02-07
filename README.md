@@ -2,9 +2,9 @@
 
 Template is a simple JS framework for creating interactive applications.
 
-It focuses on using web-native tooling.
+It focuses on using web-native patterns.
 
-Calling it a framework is a bit of an exaggeration, it's single `class` that manages HTML `<template>`s.
+Calling it a framework is a bit of an exaggeration, it's a single `class` that manages HTML `<template>`s.
 
 The entire "framework" is here: [./template.js](./template.js)
 
