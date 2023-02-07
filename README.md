@@ -100,7 +100,7 @@ For example:
 
 If you look at the files above, we've just split a standard `index.html` file up into chunks.
 
-Now we use this little shell script to "build" our app by inject our files:
+Now we use this little shell script to "build" our app by injecting our files:
 
 ```sh
 cat ./app/pre-css.html > index.html
@@ -115,7 +115,7 @@ cat ./app/**/*.js >> index.html
 cat ./app/post-js.html >> index.html
 ```
 
-Now `index.html` should contain your single page app!
+Now `index.html` contains your single page app!
 
 You can now create folders for each component (and nested components) under the app directory.
 
