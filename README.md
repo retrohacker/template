@@ -140,3 +140,5 @@ For example, here is a file system with an `Auth` component that has two subcomp
 ├── pre-js.html
 └── pre-template.html
 ```
+
+For some example components, checkout the [./examples](./examples) directory.
