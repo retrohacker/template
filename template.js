@@ -20,10 +20,13 @@ class Template {
       this.emit("change", this.state);
     }
   }
-  addChild(name, child) {
+  removeChild(name) {
     if (this.children[name]) {
       this.children[name].destroy();
     }
+  }
+  addChild(name, child) {
+    this.removeChild(name);
     this.children[name] = child;
     this.children[name].init();
   }
