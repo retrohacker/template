@@ -1,9 +1,8 @@
 class Template {
-  constructor(id, mount) {
+  constructor(id) {
     if (id) {
       this.fragment = document.getElementById(id).content.cloneNode(true);
     }
-    this.mount = mount;
     this.eventHandlers = {};
     this.children = {};
     this.state = {};
@@ -28,21 +27,23 @@ class Template {
   addChild(name, child) {
     this.removeChild(name);
     this.children[name] = child;
-    this.children[name].init();
   }
   getChild(name) {
     return this.children[name];
   }
-  init(parentNode) {
+  mount(mount) {
     if (this.mount) {
       this.mount.innerText = "";
-      this.mount.appendChild(this.fragment);
     }
+    this.mount = mount;
+    this.mount.appendChild(this.fragment);
   }
-  destroy() {
-    this.mount.innerText = "";
+  unmount() {
+    if (this.mount) {
+      this.mount.innerText = "";
+    }
     for (const child in this.children) {
-      this.children[child].destroy();
+      this.children[child].unmount();
     }
   }
   on(event, handler) {
