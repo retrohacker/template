@@ -6,6 +6,19 @@ class Template {
     this.mount = mount;
     this.eventHandlers = {};
     this.children = {};
+    this.state = {};
+  }
+  setState(obj) {
+    let changed = false;
+    for (let key in obj) {
+      if (this.state[key] !== obj[key]) {
+        changed = true;
+        this.state[key] = obj[key];
+      }
+    }
+    if (changed) {
+      this.emit("change", this.state);
+    }
   }
   addChild(name, child) {
     if (this.children[name]) {
