@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon" />
+    <script src="./template.js"></script>
+  </head>
+  <body>
+    <script>
+      class Test {
+        constructor(name, fn) {
+          this.name = name;
+          this.fn = fn;
+        }
+        async run() {
+          await this.fn();
+        }
+      }
+      const tests = [
+        new Test("emitters work", async () => {
+          const t = new Template();
+          const one = new Promise((resolve, reject) => {
+            t.on("foo", resolve);
+            setTimeout(reject, 100);
+          });
+          const two = new Promise((resolve, reject) => {
+            t.on("foo", resolve);
+            setTimeout(reject, 100);
+          });
+          const three = new Promise((resolve, reject) => {
+            t.on("bar", resolve);
+            setTimeout(reject, 100);
+          });
+          t.emit("foo");
+          t.emit("bar");
+          await Promise.all([one, two, three]);
+        }),
+        new Test("setState emits change on change", async () => {
+          const t = new Template();
+          await new Promise((resolve, reject) => {
+            t.on("change", resolve);
+            setTimeout(reject, 100);
+            t.setState({ foo: "bar" });
+          });
+        }),
+        new Test("setState does not emit change on same", async () => {
+          const t = new Template();
+          t.setState({ foo: "bar" });
+          await new Promise((resolve, reject) => {
+            t.on("change", reject);
+            t.setState({ foo: "bar" });
+            setTimeout(resolve, 100);
+          });
+        }),
+      ];
+      tests.forEach((test) =>
+        (async function runTest() {
+          try {
+            await test.run();
+            console.log(`PASS: ${test.name}`);
+          } catch (e) {
+            console.error(`FAIL: ${test.name}`, e);
+          }
+        })()
+      );
+    </script>
+  </body>
+</html>
