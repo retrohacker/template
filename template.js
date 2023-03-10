@@ -36,11 +36,18 @@ class Template {
       this.mount.innerText = "";
     }
     this.mount = mount;
-    this.mount.appendChild(this.fragment);
+    if (!mount.shadowRoot) {
+      mount.attachShadow({ mode: "open" });
+    } else {
+      mount.shadowRoot.innerHTML = "";
+    }
+    console.log(mount);
+    mount.shadowRoot.appendChild(this.fragment);
   }
   unmount() {
     if (this.mount) {
       this.mount.innerText = "";
+      this.mount.shadowRoot.innerHTML = "";
     }
     for (const child in this.children) {
       this.children[child].unmount();
