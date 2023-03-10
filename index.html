@@ -5,6 +5,9 @@
     <script src="./template.js"></script>
   </head>
   <body>
+    <template id="Mountable">
+      <h2>foobar</h2>
+    </template>
     <script>
       class Test {
         constructor(name, fn) {
@@ -16,6 +19,22 @@
         }
       }
       const tests = [
+        new Test("mounts to page", async () => {
+          class Mountable extends Template {
+            constructor() {
+              super("Mountable");
+              this.foobar = this.fragment.querySelector("h2");
+            }
+          }
+          const instance = new Mountable();
+          const node = document.createElement("div");
+          document.body.appendChild(node);
+          instance.mount(node);
+          if (instance.foobar === null) {
+            throw new Error("Unable to find mounted component");
+          }
+          instance.unmount();
+        }),
         new Test("emitters work", async () => {
           const t = new Template();
           const one = new Promise((resolve, reject) => {
