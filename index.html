@@ -64,11 +64,27 @@
         new Test("setState does not emit change on same", async () => {
           const t = new Template();
           t.setState({ foo: "bar" });
+          await new Promise((resolve) => setTimeout(resolve, 0));
           await new Promise((resolve, reject) => {
             t.on("change", reject);
             t.setState({ foo: "bar" });
             setTimeout(resolve, 100);
           });
+        }),
+        new Test("dedupe changes", async () => {
+          const t = new Template();
+          let count = 0;
+          t.on("change", () => {
+            count++;
+          });
+          t.setState({ foo: "bar" });
+          t.setState({ buzz: "bazz" });
+          t.setState({ beep: "boop" });
+          t.setState({ bleep: "bloop" });
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          if (count !== 1) {
+            throw new Error(`Emitted ${count} changes`);
+          }
         }),
       ];
       tests.forEach((test) =>

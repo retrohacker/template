@@ -6,6 +6,17 @@ class Template {
     this.eventHandlers = {};
     this.children = {};
     this.state = {};
+    this._dedupeChange = 0;
+  }
+  _emitChange() {
+    this._dedupeChange += 1;
+    window.queueMicrotask(() => {
+      if (this._dedupeChange === 0) {
+        return;
+      }
+      this._dedupeChange = 0;
+      this.emit("change", this.state);
+    });
   }
   setState(obj) {
     let changed = false;
@@ -16,7 +27,7 @@ class Template {
       }
     }
     if (changed) {
-      this.emit("change", this.state);
+      this._emitChange();
     }
     return this;
   }
