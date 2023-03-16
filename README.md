@@ -27,10 +27,9 @@ Your Hello World example:
     </template>
     <script>
       class HelloWorld extends Template {
-        constructor(mount) {
+        constructor() {
           // First argument is the id of the template
-          // second argument is a div to mount the component into
-          super("HelloWorld", mount);
+          super("HelloWorld");
           // fragment contains the hydrated template
           // We can use it to query for child nodes, in this case: class="message"
           // Anything you want to update during runtime should be stored on "this"
@@ -44,10 +43,9 @@ Your Hello World example:
       // Get the div we want to mount into
       const app = document.getElementById("app");
       // Create an instance of our HelloWorld component
-      // and prepare to mount it into "app"
-      const helloworld = new HelloWorld(app);
+      const helloworld = new HelloWorld();
       // Mount our component into the dom
-      helloworld.init();
+      helloworld.mount(app);
       // Set our message
       helloworld.setMessage("Hello Template!");
     </script>
