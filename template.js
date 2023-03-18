@@ -1,7 +1,7 @@
 class Template {
-  constructor(id) {
-    if (id) {
-      this.fragment = document.getElementById(id).content.cloneNode(true);
+  constructor(selector) {
+    if (selector) {
+      this.fragment = document.querySelector(selector).content.cloneNode(true);
     }
     this.eventHandlers = {};
     this.children = {};
