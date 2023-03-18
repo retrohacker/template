@@ -28,8 +28,8 @@ Your Hello World example:
     <script>
       class HelloWorld extends Template {
         constructor() {
-          // First argument is the id of the template
-          super("HelloWorld");
+          // First argument is the querySelector of the template
+          super("#HelloWorld");
           // fragment contains the hydrated template
           // We can use it to query for child nodes, in this case: class="message"
           // Anything you want to update during runtime should be stored on "this"
