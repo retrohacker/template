@@ -11,16 +11,16 @@ class SlideShow extends Template {
     this.wide = [];
     this.tall = [];
     this.images = [
-      "./images/1.jpg",
-      "./images/2.jpg",
-      "./images/3.jpg",
-      "./images/4.jpg",
-      "./images/5.jpg",
-      "./images/6.jpg",
-      "./images/7.jpg",
-      "./images/8.jpg",
-      "./images/9.jpg",
-      "./images/10.jpg",
+      "https://placehold.co/800x600",
+      "https://picsum.photos/800/600",
+      "https://loremflickr.com/800/600",
+      "https://placekitten.com/800/600",
+      "https://loremflickr.com/800/600",
+      "https://picsum.photos/1024/800",
+      "https://placehold.co/1024x800",
+      "https://placekitten.com/1024/800",
+      "https://loremflickr.com/1200/1024",
+      "https://picsum.photos/1200/1024",
     ];
     this.render();
   }
