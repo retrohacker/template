@@ -6,17 +6,6 @@ class Template {
     this.eventHandlers = {};
     this.children = {};
     this.state = {};
-    this._dedupeChange = 0;
-  }
-  _emitChange() {
-    this._dedupeChange += 1;
-    window.queueMicrotask(() => {
-      if (this._dedupeChange === 0) {
-        return;
-      }
-      this._dedupeChange = 0;
-      this.emit("change", this.state);
-    });
   }
   setState(obj) {
     let changed = false;
@@ -27,14 +16,15 @@ class Template {
       }
     }
     if (changed) {
-      this._emitChange();
+      this.emit("change", this.state);
     }
     return this;
   }
   removeChild(name) {
     if (this.children[name]) {
-      this.children[name].destroy();
+      this.children[name].unmount();
     }
+    delete this.children[name];
     return this;
   }
   addChild(name, child) {
@@ -56,18 +46,12 @@ class Template {
       this.host.innerText = "";
     }
     this.host = host;
-    if (!host.shadowRoot) {
-      host.attachShadow({ mode: "open" });
-    } else {
-      host.shadowRoot.innerHTML = "";
-    }
-    host.shadowRoot.appendChild(this.fragment);
+    this.host.appendChild(this.fragment);
     return this;
   }
   unmount() {
     if (this.host) {
       this.host.innerText = "";
-      this.host.shadowRoot.innerHTML = "";
     }
     for (const child in this.children) {
       this.children[child].unmount();
