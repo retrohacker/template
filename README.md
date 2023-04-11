@@ -137,5 +137,3 @@ For example, here is a file system with an `Auth` component that has two subcomp
 ```
 
 For some example components, checkout the [./examples](./examples) directory.
-
-> Note: For CSS to work with the ShadowDOM Template uses, you'll need to include `<style>` tags inside the `<template>` tag of your component's index.html file. The page's CSS will not apply to nodes in the ShadowDOM tree. You can still style some global properties in a global CSS file if you choose, but this "quirk" of web components is why there are no `index.css` files in the file tree above.
