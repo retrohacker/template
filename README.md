@@ -57,60 +57,52 @@ Your Hello World example:
 
 You'll find that your `index.html` file grows pretty quick when using Template.
 
-The fix is easy. First, create a directory called `app`.
+The fix is easy.
 
-Then create the files that make up our `index.html` "template":
+First, create a directory called `src`. Create two folders under that, `index` and `static`. `index` will be used to generate index.html, and `static` will contain static assets that get copied into your build directory. Next create a bash script that injects your files into an HTML document.
 
 For example:
+```sh
+#!/usr/bin/env bash
 
-`./app/pre-css.html`:
+mkdir -p ./build
 
-```html
+echo "
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="./template.js"></script>
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
     <style>
-```
+" > ./build/index.html
 
-`./app/pre-template.html`:
+# Inject CSS
+find ./src/index -name '*.css' | sort | xargs cat >> ./build/index.html
 
-```html
-    </style>
+echo "
+</style>
   </head>
   <body>
-    <div id="app"></div>
-```
+" >> ./build/index.html
 
-`./app/pre-js.html`:
+# Inject HTML
+find ./src/index -name '*.html' | sort | xargs cat >> ./build/index.html
 
-```html
-    <script>
-```
+echo "
+<script src='/fuse.js'></script>
+<script>
+" >> ./build/index.html
 
-`./app/post-js.html`:
+# Inject JS
+find ./src/index -name '*.js' | sort | xargs cat >> ./build/index.html
 
-```html
+
+echo "
     </script>
   </body>
-</html>
-```
+</html>" >> ./build/index.html;
 
-If you look at the files above, we've just split a standard `index.html` file up into chunks.
-
-Now we use this little shell script to "build" our app by injecting our files:
-
-```sh
-cat ./app/pre-css.html > index.html
-# Inject all of our CSS into the page
-cat ./app/**/*.css > index.html
-cat ./app/pre-template.html >> index.html
-# Inject all of our HTML into the pa ge
-cat ./app/**/*.html > index.html
-cat ./app/pre-js.html >> index.html
-# Inject all of our JS into the page
-cat ./app/**/*.js >> index.html
-cat ./app/post-js.html >> index.html
+# Copy static files over
+cp -r ./src/static/* ./build
 ```
 
 Now `index.html` contains your single page app!
@@ -120,7 +112,7 @@ You can now create folders for each component (and nested components) under the 
 For example, here is a file system with an `Auth` component that has two subcomponents `Login` and `Signup`:
 
 ```text
-./app
+./index
 ├── Auth
 │   ├── index.html
 │   ├── index.js
@@ -130,10 +122,10 @@ For example, here is a file system with an `Auth` component that has two subcomp
 │   └── Signup
 │       ├── index.html
 │       └── index.js
-├── post-js.html
-├── pre-css.html
-├── pre-js.html
-└── pre-template.html
+└── ZZ_TAIL
+    └── index.js
 ```
+
+Note the use of alpha-numeric sorting to control the order files get injected into `index.html`. In this case, we are using the prefix `ZZ_` to force `ZZ_TAIL/index.js` to be the last javascript file injected. This is the file we use to bootstrap the app after all the classes are defined.
 
 For some example components, checkout the [./examples](./examples) directory.
