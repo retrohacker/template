@@ -124,7 +124,4 @@ class Template {
     return this;
   }
 }
-
-if (module != undefined) {
-  module.exports = Template;
-}
+export default Template;
