@@ -1,14 +1,17 @@
 class Template {
-    constructor(id) {
-        if (id) {
-            const element = document.getElementById(id);
+    constructor(template) {
+        if (typeof template == "string") {
+            const element = document.getElementById(template);
             if (!element) {
-                throw new Error(`#${id} does not exist`);
+                throw new Error(`#${template} does not exist`);
             }
             if (!(element instanceof HTMLTemplateElement)) {
-                throw new Error(`#${id} is not a Template`);
+                throw new Error(`#${template} is not a Template`);
             }
             this.fragment = element.content.cloneNode(true);
+        }
+        else if (template != undefined) {
+            this.fragment = template.content.cloneNode(true);
         }
         else {
             this.fragment = null;
@@ -114,6 +117,11 @@ class Template {
             handler(...args);
         });
         return this;
+    }
+    static createElement(html) {
+        const template = document.createElement("template");
+        template.innerHTML = html;
+        return template;
     }
 }
 export default Template;
