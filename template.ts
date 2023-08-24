@@ -75,14 +75,11 @@ class Template {
     if (this.host) {
       throw new Error("Already mounted");
     }
-    if (!this.fragment) {
-      throw new Error("No fragment to mount");
-    }
     this.host = host;
     this.host.innerText = "";
     this.shadow = this.host.attachShadow({ mode: "closed" });
     this.shadow.appendChild(this.style);
-    this.shadow.appendChild(this.fragment);
+    this.shadow.appendChild(this.fragment.content.cloneNode(true));
     this.host.appendChild(this.shadow);
     return this;
   }

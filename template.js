@@ -1,123 +1,121 @@
 class Template {
-  constructor(element, style) {
-    this.fragment = element;
-    this.style = style;
-    this.host = null;
-    this.shadow = null;
-    this.eventHandlers = {};
-    this.children = {};
-    this.state = {};
-    this.destroyed = false;
-  }
-  _issafe() {
-    if (this.destroyed) {
-      throw new Error("Template has already been destroyed");
+    constructor(element, style) {
+        this.fragment = element;
+        this.style = style;
+        this.host = null;
+        this.shadow = null;
+        this.eventHandlers = {};
+        this.children = {};
+        this.state = {};
+        this.destroyed = false;
     }
-  }
-  setState(obj) {
-    let changed = false;
-    for (let key in obj) {
-      if (this.state[key] !== obj[key]) {
-        const value = obj[key];
-        changed = true;
-        if (value == undefined) {
-          delete this.state[key];
-        } else {
-          this.state[key] = value;
+    _issafe() {
+        if (this.destroyed) {
+            throw new Error("Template has already been destroyed");
         }
-      }
     }
-    if (changed) {
-      this.emit("change", this.state);
+    setState(obj) {
+        let changed = false;
+        for (let key in obj) {
+            if (this.state[key] !== obj[key]) {
+                const value = obj[key];
+                changed = true;
+                if (value == undefined) {
+                    delete this.state[key];
+                }
+                else {
+                    this.state[key] = value;
+                }
+            }
+        }
+        if (changed) {
+            this.emit("change", this.state);
+        }
+        return this;
     }
-    return this;
-  }
-  removeChild(name) {
-    const child = this.children[name];
-    if (child == undefined) {
-      return this;
+    removeChild(name) {
+        const child = this.children[name];
+        if (child == undefined) {
+            return this;
+        }
+        child.unmount();
+        delete this.children[name];
+        return this;
     }
-    child.unmount();
-    delete this.children[name];
-    return this;
-  }
-  addChild(name, child) {
-    this.removeChild(name);
-    this.children[name] = child;
-    return this;
-  }
-  addChildren(obj) {
-    for (let name in obj) {
-      const child = obj[name];
-      if (child == undefined) {
-        continue;
-      }
-      this.addChild(name, child);
+    addChild(name, child) {
+        this.removeChild(name);
+        this.children[name] = child;
+        return this;
     }
-    return this;
-  }
-  getChild(name) {
-    return this.children[name];
-  }
-  mount(host) {
-    if (this.host) {
-      throw new Error("Already mounted");
+    addChildren(obj) {
+        for (let name in obj) {
+            const child = obj[name];
+            if (child == undefined) {
+                continue;
+            }
+            this.addChild(name, child);
+        }
+        return this;
     }
-    if (!this.fragment) {
-      throw new Error("No fragment to mount");
+    getChild(name) {
+        return this.children[name];
     }
-    this.host = host;
-    this.host.innerText = "";
-    this.shadow = this.host.attachShadow({ mode: "closed" });
-    this.shadow.appendChild(this.style);
-    this.shadow.appendChild(this.fragment);
-    this.host.appendChild(this.shadow);
-    return this;
-  }
-  unmount() {
-    for (const name in this.children) {
-      const child = this.children[name];
-      if (child == undefined) {
-        continue;
-      }
-      child.unmount();
+    mount(host) {
+        if (this.host) {
+            throw new Error("Already mounted");
+        }
+        this.host = host;
+        this.host.innerText = "";
+        this.shadow = this.host.attachShadow({ mode: "closed" });
+        this.shadow.appendChild(this.style);
+        this.shadow.appendChild(this.fragment.content.cloneNode(true));
+        this.host.appendChild(this.shadow);
+        return this;
     }
-    if (this.host) {
-      this.host.innerText = "";
+    unmount() {
+        for (const name in this.children) {
+            const child = this.children[name];
+            if (child == undefined) {
+                continue;
+            }
+            child.unmount();
+        }
+        if (this.host) {
+            this.host.innerText = "";
+        }
+        this.host = null;
+        this.shadow = null;
+        this.eventHandlers = {};
+        this.children = {};
+        this.state = {};
+        this.destroyed = true;
+        return;
     }
-    this.host = null;
-    this.shadow = null;
-    this.eventHandlers = {};
-    this.children = {};
-    this.state = {};
-    this.destroyed = true;
-    return;
-  }
-  on(event, handler) {
-    const handlers = this.eventHandlers[event] || [];
-    this.eventHandlers[event] = handlers;
-    handlers.push(handler);
-    return this;
-  }
-  emit(event, ...args) {
-    const handlers = this.eventHandlers[event];
-    if (handlers == undefined) {
-      return this;
+    on(event, handler) {
+        const handlers = this.eventHandlers[event] || [];
+        this.eventHandlers[event] = handlers;
+        handlers.push(handler);
+        return this;
     }
-    handlers.forEach((handler) => {
-      handler(...args);
-    });
-    return this;
-  }
-  static createElement(html) {
-    const template = document.createElement("template");
-    template.innerHTML = html;
-    return template;
-  }
-  static createStyle(css) {
-    const style = document.createElement("style");
-    style.textContent = css;
-    return style;
-  }
+    emit(event, ...args) {
+        const handlers = this.eventHandlers[event];
+        if (handlers == undefined) {
+            return this;
+        }
+        handlers.forEach((handler) => {
+            handler(...args);
+        });
+        return this;
+    }
+    static createElement(html) {
+        const template = document.createElement("template");
+        template.innerHTML = html;
+        return template;
+    }
+    static createStyle(css) {
+        const style = document.createElement("style");
+        style.textContent = css;
+        return style;
+    }
 }
 export default Template;
