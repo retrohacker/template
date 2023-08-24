@@ -1,0 +1,13 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "description": "Lightweight UI Framework",
+  "main": "template.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.4",
+    "typescript": "^5.2.2"
+  }
+}
