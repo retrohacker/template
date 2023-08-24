@@ -60,23 +60,31 @@ class Template {
         delete this.children[name];
         return this;
     }
-    addChild(name, child) {
-        this.removeChild(name);
-        this.children[name] = child;
+    addChild(selector, child) {
+        if (this.children[selector] != undefined) {
+            throw new Error("Child already mounted");
+        }
+        const element = this.getElement(selector);
+        child.mount(element);
+        this.children[selector] = child;
         return this;
     }
     addChildren(obj) {
-        for (let name in obj) {
-            const child = obj[name];
+        for (let query in obj) {
+            const child = obj[query];
             if (child == undefined) {
                 continue;
             }
-            this.addChild(name, child);
+            this.addChild(query, child);
         }
         return this;
     }
-    getChild(name) {
-        return this.children[name];
+    getChild(query) {
+        const child = this.children[query];
+        if (child == undefined) {
+            throw new Error(`Unknown child ${query}`);
+        }
+        return child;
     }
     mount(host) {
         if (this.host) {
@@ -93,8 +101,8 @@ class Template {
         return this;
     }
     unmount() {
-        for (const name in this.children) {
-            const child = this.children[name];
+        for (const query in this.children) {
+            const child = this.children[query];
             if (child == undefined) {
                 continue;
             }

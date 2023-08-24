@@ -1,6 +1,6 @@
 type EventHandlers = { [name: string]: Function[] };
 type State = { [name: string]: string | number | boolean };
-type Children = { [name: string]: Template };
+type Children = { [query: string]: Template };
 
 class Template {
   fragment: HTMLTemplateElement;
@@ -71,23 +71,31 @@ class Template {
     delete this.children[name];
     return this;
   }
-  addChild(name: string, child: Template): Template {
-    this.removeChild(name);
-    this.children[name] = child;
+  addChild(selector: string, child: Template): Template {
+    if (this.children[selector] != undefined) {
+      throw new Error("Child already mounted");
+    }
+    const element = this.getElement(selector);
+    child.mount(element);
+    this.children[selector] = child;
     return this;
   }
   addChildren(obj: Children): Template {
-    for (let name in obj) {
-      const child = obj[name];
+    for (let query in obj) {
+      const child = obj[query];
       if (child == undefined) {
         continue;
       }
-      this.addChild(name, child);
+      this.addChild(query, child);
     }
     return this;
   }
-  getChild(name: string): Template | undefined {
-    return this.children[name];
+  getChild(query: string): Template {
+    const child = this.children[query];
+    if (child == undefined) {
+      throw new Error(`Unknown child ${query}`);
+    }
+    return child;
   }
   mount(host: HTMLElement): Template {
     if (this.host) {
@@ -104,8 +112,8 @@ class Template {
     return this;
   }
   unmount() {
-    for (const name in this.children) {
-      const child = this.children[name];
+    for (const query in this.children) {
+      const child = this.children[query];
       if (child == undefined) {
         continue;
       }
