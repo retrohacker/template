@@ -3,28 +3,19 @@ type State = { [name: string]: string | number | boolean };
 type Children = { [name: string]: Template };
 
 class Template {
-  fragment: Node | null;
+  fragment: HTMLTemplateElement;
+  style: HTMLStyleElement;
   eventHandlers: EventHandlers;
   children: Children;
   state: { [name: string]: string | number | boolean };
   host: HTMLElement | null;
+  shadow: ShadowRoot | null;
   destroyed: Boolean;
-  constructor(template: string | HTMLTemplateElement) {
-    if (typeof template == "string") {
-      const element = document.getElementById(template);
-      if (!element) {
-        throw new Error(`#${template} does not exist`);
-      }
-      if (!(element instanceof HTMLTemplateElement)) {
-        throw new Error(`#${template} is not a Template`);
-      }
-      this.fragment = element.content.cloneNode(true);
-    } else if (template != undefined) {
-      this.fragment = template.content.cloneNode(true);
-    } else {
-      this.fragment = null;
-    }
+  constructor(element: HTMLTemplateElement, style: HTMLStyleElement) {
+    this.fragment = element;
+    this.style = style;
     this.host = null;
+    this.shadow = null;
     this.eventHandlers = {};
     this.children = {};
     this.state = {};
@@ -88,7 +79,11 @@ class Template {
       throw new Error("No fragment to mount");
     }
     this.host = host;
-    this.host.appendChild(this.fragment);
+    this.host.innerText = "";
+    this.shadow = this.host.attachShadow({ mode: "closed" });
+    this.shadow.appendChild(this.style);
+    this.shadow.appendChild(this.fragment);
+    this.host.appendChild(this.shadow);
     return this;
   }
   unmount() {
@@ -103,6 +98,7 @@ class Template {
       this.host.innerText = "";
     }
     this.host = null;
+    this.shadow = null;
     this.eventHandlers = {};
     this.children = {};
     this.state = {};
@@ -129,6 +125,11 @@ class Template {
     const template = document.createElement("template");
     template.innerHTML = html;
     return template;
+  }
+  static createStyle(css: string): HTMLStyleElement {
+    const style = document.createElement("style");
+    style.textContent = css;
+    return style;
   }
 }
 
