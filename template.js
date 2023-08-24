@@ -3,7 +3,6 @@ class Template {
         this.fragment = element;
         this.style = style;
         this.host = null;
-        this.shadow = null;
         this.eventHandlers = {};
         this.children = {};
         this.state = {};
@@ -66,10 +65,12 @@ class Template {
         }
         this.host = host;
         this.host.innerText = "";
-        this.shadow = this.host.attachShadow({ mode: "closed" });
-        this.shadow.appendChild(this.style);
-        this.shadow.appendChild(this.fragment.content.cloneNode(true));
-        this.host.appendChild(this.shadow);
+        this.host.attachShadow({ mode: "open" });
+        if (!this.host.shadowRoot) {
+            throw new Error("Failed to create shadow root");
+        }
+        this.host.shadowRoot.appendChild(this.style);
+        this.host.shadowRoot.appendChild(this.fragment.content.cloneNode(true));
         return this;
     }
     unmount() {
@@ -84,7 +85,6 @@ class Template {
             this.host.innerText = "";
         }
         this.host = null;
-        this.shadow = null;
         this.eventHandlers = {};
         this.children = {};
         this.state = {};
