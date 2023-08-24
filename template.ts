@@ -6,6 +6,7 @@ class Template {
   fragment: HTMLTemplateElement;
   style: HTMLStyleElement;
   eventHandlers: EventHandlers;
+  elements: { [query: string]: HTMLElement };
   children: Children;
   state: { [name: string]: string | number | boolean };
   host: HTMLElement | null;
@@ -15,6 +16,7 @@ class Template {
     this.style = style;
     this.host = null;
     this.eventHandlers = {};
+    this.elements = {};
     this.children = {};
     this.state = {};
     this.destroyed = false;
@@ -23,6 +25,24 @@ class Template {
     if (this.destroyed) {
       throw new Error("Template has already been destroyed");
     }
+  }
+  getElement(selector: string): HTMLElement {
+    const element = this.elements[selector];
+    if (element != undefined) {
+      return element;
+    }
+    if (this.host == undefined || this.host.shadowRoot == undefined) {
+      throw new Error("Template has not been mounted");
+    }
+    const result = this.host.shadowRoot.querySelector(selector);
+    if (result == undefined) {
+      throw new Error(`Element ${selector} not found`);
+    }
+    if (!(result instanceof HTMLElement)) {
+      throw new Error(`${selector} did not return an HTMLElement`);
+    }
+    this.elements[selector] = result;
+    return result;
   }
   setState(obj: State) {
     let changed = false;
@@ -96,6 +116,7 @@ class Template {
     }
     this.host = null;
     this.eventHandlers = {};
+    this.elements = {};
     this.children = {};
     this.state = {};
     this.destroyed = true;
