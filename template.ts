@@ -103,7 +103,9 @@ class Template {
     }
     this.host = host;
     this.host.innerText = "";
-    this.host.attachShadow({ mode: "open" });
+    if (!this.host.shadowRoot) {
+      this.host.attachShadow({ mode: "open" });
+    }
     if (!this.host.shadowRoot) {
       throw new Error("Failed to create shadow root");
     }
@@ -121,6 +123,9 @@ class Template {
     }
     if (this.host) {
       this.host.innerText = "";
+      if (this.host.shadowRoot) {
+        this.host.shadowRoot.innerHTML = "";
+      }
     }
     this.host = null;
     this.eventHandlers = {};
