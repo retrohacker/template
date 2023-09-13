@@ -7,7 +7,7 @@ It focuses on using web-native patterns.
 Calling it a framework is a bit of an exaggeration, it's a single `class` that
 manages HTML `<template>`s.
 
-The entire "framework" is here: [./template.js](./template.js)
+The entire "framework" is here: [./template.ts](./template.ts)
 
 # Usage
 
@@ -52,6 +52,32 @@ Your Hello World example:
   </body>
 </html>
 ```
+
+# How it works
+
+Template uses HTML
+[`<template>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template)
+to create reusable components.
+
+We then "mount" a `<template>` into an element on the page by creating a
+[shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM).
+
+The shadow DOM encapsulates the reusable components making sure that the CSS and
+JS from one component can not interfere with another.
+
+Using `.addChild(selector: string, child: Template)` allows us to nest these
+components. The parent keeps track of all mounted children. When we unmount the
+parent, it will recursively unmount all children.
+
+We follow React's philosophy of state flowing down. Our components manage their
+own children, configuring the child's state. Children manage updating their own
+DOM to reflect changes in state.
+
+We also follow React's philosophy of state bubbling up. When a user interacts
+with a child node, the child node emits an event. The parent receives the event
+and decides what to do.
+
+State management, event propogation, etc. are still early and need more thought.
 
 # Build process
 
