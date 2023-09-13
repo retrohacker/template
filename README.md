@@ -16,12 +16,11 @@ Your Hello World example:
 ```html
 <!DOCTYPE >
 <html>
-  <head>
-    <script src="./template.js"></script>
-  </head>
+  <head></head>
   <body>
     <div id="app"></div>
-    <script>
+    <script type="module">
+      import Template from "./template.js";
       // Create an HTMLTemplateElement from the text representation of HTML
       const html = Template.createElement(
         '<div><h1 class="message">Hello Template</h2></div>'
