@@ -4,7 +4,8 @@ Template is a simple JS framework for creating interactive applications.
 
 It focuses on using web-native patterns.
 
-Calling it a framework is a bit of an exaggeration, it's a single `class` that manages HTML `<template>`s.
+Calling it a framework is a bit of an exaggeration, it's a single `class` that
+manages HTML `<template>`s.
 
 The entire "framework" is here: [./template.js](./template.js)
 
@@ -20,24 +21,23 @@ Your Hello World example:
   </head>
   <body>
     <div id="app"></div>
-    <template id="HelloWorld">
-      <div class="hello-world">
-        <h1 class="message"></h1>
-      </div>
-    </template>
     <script>
+      // Create an HTMLTemplateElement from the text representation of HTML
+      const html = Template.createElement(
+        '<div><h1 class="message">Hello Template</h2></div>'
+      );
+      // Create an HTMLStyleElement from the text representation of a style node
+      const css = Template.createStyle("<style></style>");
       class HelloWorld extends Template {
         constructor() {
-          // First argument is the id of the template
-          super("HelloWorld");
-          // fragment contains the hydrated template
-          // We can use it to query for child nodes, in this case: class="message"
-          // Anything you want to update during runtime should be stored on "this"
-          this.message = this.fragment.querySelector(".message");
+          super(html, css);
         }
         setMessage(msg) {
+          // We can use getElement to query for child nodes, in this case: class="message"
+          // Anything you want to update during runtime should be stored on "this"
+          const message = this.getElement(".message");
           // Update the content of <h1 class="message">
-          this.message.innerText = msg;
+          message.innerText = msg;
         }
       }
       // Get the div we want to mount into
@@ -55,77 +55,78 @@ Your Hello World example:
 
 # Build process
 
-You'll find that your `index.html` file grows pretty quick when using Template.
-
-The fix is easy.
-
-First, create a directory called `src`. Create two folders under that, `index` and `static`. `index` will be used to generate index.html, and `static` will contain static assets that get copied into your build directory. Next create a bash script that injects your files into an HTML document.
+You'll want to use a bundler like `vite`
 
 For example:
-```sh
-#!/usr/bin/env bash
 
-mkdir -p ./build
+`index.html`
 
-echo "
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
-    <style>
-" > ./build/index.html
-
-# Inject CSS
-find ./src/index -name '*.css' | sort | xargs cat >> ./build/index.html
-
-echo "
-</style>
-  </head>
-  <body>
-" >> ./build/index.html
-
-# Inject HTML
-find ./src/index -name '*.html' | sort | xargs cat >> ./build/index.html
-
-echo "
-<script src='/fuse.js'></script>
-<script>
-" >> ./build/index.html
-
-# Inject JS
-find ./src/index -name '*.js' | sort | xargs cat >> ./build/index.html
-
-
-echo "
-    </script>
-  </body>
-</html>" >> ./build/index.html;
-
-# Copy static files over
-cp -r ./src/static/* ./build
+```html
+<div class="WelcomeComponent">
+  <div class="new button">
+    <div class="icon"></div>
+    <div class="title">Create New<br />Account</div>
+  </div>
+  <div class="pair button">
+    <div class="icon"></div>
+    <div class="title">Pair Existing<br />Account</div>
+  </div>
+</div>
 ```
 
-Now `index.html` contains your single page app!
+`index.css`
 
-You can now create folders for each component (and nested components) under the app directory.
-
-For example, here is a file system with an `Auth` component that has two subcomponents `Login` and `Signup`:
-
-```text
-./index
-├── Auth
-│   ├── index.html
-│   ├── index.js
-│   ├── Login
-│   │   ├── index.html
-│   │   └── index.js
-│   └── Signup
-│       ├── index.html
-│       └── index.js
-└── ZZ_TAIL
-    └── index.js
+```css
+.WelcomeComponent {
+  background-color: hsla(0, 0%, 100%, 1);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+}
+.button {
+  padding: 1em;
+  margin: 0.5em;
+  cursor: pointer;
+  background-color: inherit;
+  transition: background-color linear 0.1s;
+  border-radius: inherit;
+}
+.button:hover {
+  background-color: hsla(0, 0%, 90%, 1);
+  transition: background-color linear 0.1s;
+}
 ```
 
-Note the use of alpha-numeric sorting to control the order files get injected into `index.html`. In this case, we are using the prefix `ZZ_` to force `ZZ_TAIL/index.js` to be the last javascript file injected. This is the file we use to bootstrap the app after all the classes are defined.
+`index.ts`
 
-For some example components, checkout the [./examples](./examples) directory.
+```typescript
+import Template from "template";
+import Feather from "feather-icons";
+import html from "./index.html?raw";
+import css from "./index.css?raw";
+
+const template = Template.createElement(html);
+const style = Template.createStyle(css);
+
+class Welcome extends Template {
+  constructor() {
+    super(template, style);
+  }
+  mount(host: HTMLElement) {
+    super.mount(host);
+    this.getElement(".new > .icon").innerHTML =
+      Feather.icons["user-plus"].toSvg();
+    this.getElement(".new").addEventListener("click", () => {
+      this.emit("new");
+    });
+    this.getElement(".pair > .icon").innerHTML =
+      Feather.icons["smartphone"].toSvg();
+    this.getElement(".pair").addEventListener("click", () => {
+      this.emit("pair");
+    });
+    return this;
+  }
+}
+
+export default Welcome;
+```

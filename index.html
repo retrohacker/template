@@ -2,13 +2,10 @@
 <html>
   <head>
     <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon" />
-    <script src="./template.js"></script>
   </head>
   <body>
-    <template id="Mountable">
-      <h2>foobar</h2>
-    </template>
-    <script>
+    <script type="module">
+      import Template from "./template.js";
       class Test {
         constructor(name, fn) {
           this.name = name;
@@ -18,19 +15,21 @@
           await this.fn();
         }
       }
+      const html = Template.createElement("<div><h2>Hello Template</h2></div>");
+      const css = Template.createStyle("<style></style>");
       const tests = [
         new Test("mounts to page", async () => {
           class Mountable extends Template {
             constructor() {
-              super("Mountable");
-              this.foobar = this.fragment.querySelector("h2");
+              super(html, css);
             }
           }
           const instance = new Mountable();
-          const node = document.createElement("div");
-          document.body.appendChild(node);
-          instance.mount(node);
-          if (instance.foobar === null) {
+          instance.mount(document.body);
+          if (
+            document.body.shadowRoot.querySelector("h2") !==
+            instance.getElement("h2")
+          ) {
             throw new Error("Unable to find mounted component");
           }
           instance.unmount();
@@ -70,21 +69,6 @@
             t.setState({ foo: "bar" });
             setTimeout(resolve, 100);
           });
-        }),
-        new Test("dedupe changes", async () => {
-          const t = new Template();
-          let count = 0;
-          t.on("change", () => {
-            count++;
-          });
-          t.setState({ foo: "bar" });
-          t.setState({ buzz: "bazz" });
-          t.setState({ beep: "boop" });
-          t.setState({ bleep: "bloop" });
-          await new Promise((resolve) => setTimeout(resolve, 100));
-          if (count !== 1) {
-            throw new Error(`Emitted ${count} changes`);
-          }
         }),
       ];
       tests.forEach((test) =>
