@@ -9,11 +9,6 @@ class Template {
         this.state = {};
         this.destroyed = false;
     }
-    _issafe() {
-        if (this.destroyed) {
-            throw new Error("Template has already been destroyed");
-        }
-    }
     getElement(selector) {
         const element = this.elements[selector];
         if (element != undefined) {
